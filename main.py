@@ -24,9 +24,9 @@ import pdb
 gamma = 1.4 # For diatomic gas
 ainfty = 343.0 # Speed of sound (m/s)
 Pinfty = 10.0 # Free stream pressure
-V = 10.0 # Free stream velocity
+V = 600.0 # Free stream velocity
 # airfoil = np.loadtxt('NACA0012.dat')
-airfoil = np.loadtxt('NACA2414.dat')
+# airfoil = np.loadtxt('NACA2414.dat')
 # airfoil = np.loadtxt('NACA63-412.dat')
 
 # Nomenclature
@@ -48,6 +48,9 @@ theta = np.arcsin(np.abs(P2[0] - P1[0]) / 2 / R)
 theta = np.linspace(np.pi / 2 + theta, np.pi / 2 - theta, 100)
 Zx = xc + R * np.cos(theta)
 Zy = yc + R * np.sin(theta)
+
+# Zx = np.linspace(-1, 1, 100)
+# Zy = Zx + 1
 
 # Comment if you don't want to use airfoil
 Zx = airfoil[:, 0]
