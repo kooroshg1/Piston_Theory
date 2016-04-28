@@ -22,9 +22,10 @@ import matplotlib.pyplot as plt
 import pdb
 
 gamma = 1.4 # For diatomic gas
-ainfty = 343.0 # Speed of sound (m/s)
-Pinfty = 101000 # Free stream pressure
-V = 340.29 # Free stream velocity
+aInfty = 343.0 # Speed of sound (m/s)
+pInfty = 6.934 # Free stream pressure
+rhoInfty = 1.225 # Free stream density
+V = 1374.7716 # Free stream velocity
 # airfoil = np.loadtxt('NACA0012.dat')
 # airfoil = np.loadtxt('NACA2414.dat')
 # airfoil = np.loadtxt('NACA63-412.dat')
@@ -63,34 +64,51 @@ Zy = airfoil[:, 1]
 # plt.show()
 
 # Calcualte the spatial part of the velocity
-dZdx = (Zy[2:] - Zy[:-2]) / (Zx[2:] - Zx[:-2])
+# dZdx = (Zy[2:] - Zy[:-2]) / (Zx[2:] - Zx[:-2])
+dZdx = (Zy[1:] - Zy[:-1]) / (Zx[1:] - Zx[:-1])
 # Calcualte the temporal part of the velocity
 dZdt = 0.0
 # Calculate normal velocity
-vn = V * dZdx
-
+vn = dZdt + V * dZdx
 # Calculate pressure
-P = Pinfty + Pinfty * (gamma * vn / ainfty + gamma * (gamma + 1) * (vn / ainfty)**2 / 4 +
-                       gamma * (gamma + 1) * (vn / ainfty)**3 / 12)
+# P = Pinfty + Pinfty * (gamma * vn / ainfty + gamma * (gamma + 1) * (vn / ainfty)**2 / 4 +
+#                        gamma * (gamma + 1) * (vn / ainfty)**3 / 12)
+# P = pInfty + rhoInfty * aInfty**2 * ((vn / aInfty) +
+#                                      (gamma + 1) / 4 * (vn / aInfty)**2 +
+#                                      (gamma + 1) / 12 * (vn / aInfty)**3)
+P = pInfty * (1 + ((gamma - 1) / 2) * (vn / aInfty))**(2 * gamma / (gamma - 1))
+P = np.divide(P, pInfty)
+X = (Zx[1:] + Zx[:-1]) / 2.0
 
+writeData = np.zeros([len(X), 2])
+writeData[:, 0] = X
+writeData[:, 1] = P
+# print(P)
+np.savetxt('pressure.txt', writeData)
+
+# Cp = (P - Pinfty) / (0.5 * V**2.0)
 # plt.figure()
-# plt.plot(Zx[1:-1], P)
-# plt.xlabel('Location on X axis (m)')
-# plt.ylabel('Pressure (Pa)')
+# plt.plot(Cp)
 # plt.show()
 
-fig, ax1 = plt.subplots()
-ax1.plot(Zx, Zy, 'k.')
-ax1.set_xlabel('Location on X axis (m)')
-# Make the y-axis label and tick labels match the line color.
-ax1.set_ylabel('Location on Y axis (m)', color='k')
-plt.axis('equal')
-for tl in ax1.get_yticklabels():
-    tl.set_color('k')
-
-ax2 = ax1.twinx()
-ax2.plot(Zx[1:-1], P, 'ro')
-ax2.set_ylabel('Pressure', color='r')
-for tl in ax2.get_yticklabels():
-    tl.set_color('r')
+plt.figure()
+plt.plot(Zx[:-1], P, 'o')
+plt.xlabel('Location on X axis (m)')
+plt.ylabel('Pressure (Pa)')
 plt.show()
+
+# fig, ax1 = plt.subplots()
+# ax1.plot(Zx, Zy, 'k.')
+# ax1.set_xlabel('Location on X axis (m)')
+# # Make the y-axis label and tick labels match the line color.
+# ax1.set_ylabel('Location on Y axis (m)', color='k')
+# plt.axis('equal')
+# for tl in ax1.get_yticklabels():
+#     tl.set_color('k')
+#
+# ax2 = ax1.twinx()
+# ax2.plot(Zx[1:-1], P, 'ro')
+# ax2.set_ylabel('Pressure', color='r')
+# for tl in ax2.get_yticklabels():
+#     tl.set_color('r')
+# plt.show()
